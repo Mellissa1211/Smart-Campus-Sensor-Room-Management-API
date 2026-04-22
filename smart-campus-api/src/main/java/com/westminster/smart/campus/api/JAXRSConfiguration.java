@@ -9,4 +9,5 @@ import javax.ws.rs.core.Application;
  */
 @ApplicationPath("/api/v1")
 public class JAXRSConfiguration extends Application {
+    // Empty body — the annotation does everything
 }
