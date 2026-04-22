@@ -15,30 +15,56 @@ import java.util.*;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class SensorRoomResource {
-    private DataStore data = DataStore.getInstance();
+    
+    private final DataStore dataStore = DataStore.getInstance();
 
-    /** TASK 2.2: List all rooms */
+    // TASK 2.1 - List all rooms
     @GET
-    public List<Room> getAll() { return new ArrayList<>(data.rooms.values()); }
-
-    /** TASK 2.1: Add a new room */
-    @POST
-    public Response create(Room r) {
-        data.rooms.put(r.getId(), r);
-        return Response.status(Response.Status.CREATED).entity(r).build();
+    public List<Room> getAllRooms() {
+        return new ArrayList<>(dataStore.rooms.values());
     }
 
-    /** TASK 2.3: Delete room with safety validation */
-    @DELETE
-    @Path("{id}")
-    public Response delete(@PathParam("id") String id) {
-        Room r = data.rooms.get(id);
-        
-        if (r != null && !r.getSensorIds().isEmpty()) {
-            throw new RoomNotEmptyException("Room cannot be deleted: it has active sensors.");
+    // TASK 2.1 - Create a new room, returns 201 Created
+    @POST
+    public Response createRoom(Room room) {
+        dataStore.rooms.put(room.getId(), room);
+        return Response.status(Response.Status.CREATED).entity(room).build();
+    }
+
+    // TASK 2.1 - Get a specific room by ID
+    @GET
+    @Path("{roomId}")
+    public Response getRoomById(@PathParam("roomId") String roomId) {
+        Room room = dataStore.rooms.get(roomId);
+        if (room == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"error\": \"Room not found: " + roomId + "\"}").build();
         }
-        data.rooms.remove(id);
-        
-        return Response.noContent().build();
+        return Response.ok(room).build();
+    }
+
+    // TASK 2.3 - Delete room with safety check
+    // Throws RoomNotEmptyException (→ 409) if the room still has sensors
+    @DELETE
+    @Path("{roomId}")
+    public Response deleteRoom(@PathParam("roomId") String roomId) {
+        Room room = dataStore.rooms.get(roomId);
+
+        if (room == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"error\": \"Room not found: " + roomId + "\"}").build();
+        }
+
+        // TASK 5.1 safety check — block deletion if sensors are still assigned
+        if (!room.getSensorIds().isEmpty()) {
+            throw new RoomNotEmptyException(
+                "Cannot delete room '" + roomId + "'. It still has "
+                + room.getSensorIds().size() + " active sensor(s). "
+                + "Deregister all sensors first."
+            );
+        }
+
+        dataStore.rooms.remove(roomId);
+        return Response.noContent().build(); // 204
     }
 }
