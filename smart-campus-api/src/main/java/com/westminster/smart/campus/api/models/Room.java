@@ -8,7 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TASK 2.1: Room Entity Model
+ * TASK 2.1 - Room Model
+ * Represents a physical campus room (lab, library, lecture hall etc.)
+ * sensorIds list links this room to its installed sensors.
+ * TASK 2.3 RULE: Room cannot be deleted if sensorIds is not empty.
  */
 public class Room {
     private String id;
