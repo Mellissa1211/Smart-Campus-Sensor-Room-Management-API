@@ -9,21 +9,18 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * TASK 8: Database Constraint
- * Using ConcurrentHashMap instead of SQL/NoSQL to store data in-memory.
- * This class follows the Singleton pattern to ensure data persists during the app lifecycle.
+ * Part 1.1 - Data Management - Use data structures like HashMap/ArrayList (No SQL allowed)
  */
 public class DataStore {
-    private static DataStore instance;
+    private static DataStore instance = new DataStore();
     
+    // Task 1.1: Architectural decision to use ConcurrentHashMap for race-condition prevention
     public Map<String, Room> rooms = new ConcurrentHashMap<>();
+    
     public Map<String, Sensor> sensors = new ConcurrentHashMap<>();
+    
     public Map<String, List<SensorReading>> readings = new ConcurrentHashMap<>();
 
     private DataStore() {}
-
-    public static synchronized DataStore getInstance() {
-        if (instance == null) instance = new DataStore();
-        return instance;
-    }
+    public static DataStore getInstance() { return instance; }
 }
