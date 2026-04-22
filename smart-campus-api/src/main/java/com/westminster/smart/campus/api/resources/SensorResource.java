@@ -12,35 +12,75 @@ import javax.ws.rs.core.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * TASK 3 - Sensor Operations & Linking
+ */
+
 @Path("sensors")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class SensorResource {
-    private DataStore data = DataStore.getInstance();
 
-    /** TASK 3.1: Register a sensor and link to a room */
+    private final DataStore dataStore = DataStore.getInstance();
+
+    // TASK 3.1 - Register a sensor, validate roomId exists first
     @POST
-    public Response register(Sensor s) {
-        if (!data.rooms.containsKey(s.getRoomId())) {
-            throw new LinkedResourceNotFoundException("Room ID " + s.getRoomId() + " not found.");
+    public Response registerSensor(Sensor sensor) {
+        // TASK 5.2 - If roomId doesn't exist, throw 422
+        if (sensor.getRoomId() == null || !dataStore.rooms.containsKey(sensor.getRoomId())) {
+            throw new LinkedResourceNotFoundException(
+                "Cannot register sensor. Room ID '"
+                + sensor.getRoomId() + "' does not exist. Create the room first."
+            );
         }
-        data.sensors.put(s.getId(), s);
-        data.rooms.get(s.getRoomId()).getSensorIds().add(s.getId());
-        return Response.status(Response.Status.CREATED).entity(s).build();
+        dataStore.sensors.put(sensor.getId(), sensor);
+        // Side effect: add sensor ID to the parent room's sensorIds list
+        dataStore.rooms.get(sensor.getRoomId()).getSensorIds().add(sensor.getId());
+        return Response.status(Response.Status.CREATED).entity(sensor).build();
     }
 
-    /** TASK 3.2: Filter sensors by type using Query Parameters */
+    // TASK 3.2 - Get all sensors, with optional ?type= filter (case-insensitive)
     @GET
-    public List<Sensor> get(@QueryParam("type") String type) {
-        if (type == null) return new ArrayList<>(data.sensors.values());
-        return data.sensors.values().stream()
-            .filter(s -> s.getType().equalsIgnoreCase(type))
-            .collect(Collectors.toList());
+    public List<Sensor> getSensors(@QueryParam("type") String type) {
+        if (type == null || type.trim().isEmpty()) {
+            return new ArrayList<>(dataStore.sensors.values());
+        }
+        return dataStore.sensors.values().stream()
+                .filter(s -> s.getType() != null && s.getType().equalsIgnoreCase(type))
+                .collect(Collectors.toList());
     }
 
-    /** TASK 4.1: Sub-resource locator for nested readings */
-    @Path("{id}/read")
-    public SensorReadingResource getReadings(@PathParam("id") String id) {
-        return new SensorReadingResource(id);
+    // Get a single sensor by ID
+    @GET
+    @Path("{sensorId}")
+    public Response getSensorById(@PathParam("sensorId") String sensorId) {
+        Sensor sensor = dataStore.sensors.get(sensorId);
+        if (sensor == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"error\": \"Sensor not found: " + sensorId + "\"}").build();
+        }
+        return Response.ok(sensor).build();
+    }
+
+    // Update a sensor — use this to change status to MAINTENANCE/ACTIVE/OFFLINE
+    @PUT
+    @Path("{sensorId}")
+    public Response updateSensor(@PathParam("sensorId") String sensorId, Sensor updated) {
+        Sensor existing = dataStore.sensors.get(sensorId);
+        if (existing == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"error\": \"Sensor not found: " + sensorId + "\"}").build();
+        }
+        existing.setType(updated.getType());
+        existing.setStatus(updated.getStatus());
+        existing.setCurrentValue(updated.getCurrentValue());
+        return Response.ok(existing).build();
+    }
+
+    // TASK 4.1 - Sub-resource locator: delegates /sensors/{id}/read to SensorReadingResource
+    // No @GET/@POST here — just @Path makes it a locator, not a regular endpoint
+    @Path("{sensorId}/read")
+    public SensorReadingResource getReadingSubResource(@PathParam("sensorId") String sensorId) {
+        return new SensorReadingResource(sensorId);
     }
 }
