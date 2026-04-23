@@ -20,27 +20,62 @@ public class SensorResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Sensor> getSensors(@QueryParam("type") String type) {
+    public Response getSensors(@QueryParam("type") String type) {
+        List<Sensor> result;
         if (type != null) {
-            return DataStore.sensors.values().stream()
+            result = DataStore.sensors.values().stream()
                     .filter(s -> s.getType().equalsIgnoreCase(type))
-                    .collect(Collectors.toList()); // [cite: 134, 135]
+                    .collect(Collectors.toList());
+        } else {
+            result = new ArrayList<>(DataStore.sensors.values());
         }
-        return new ArrayList<>(DataStore.sensors.values());
+        return Response.ok(result).build();
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)  // ← THIS IS THE FIX
     public Response addSensor(Sensor sensor) {
-        if (!DataStore.rooms.containsKey(sensor.getRoomId())) {
-            throw new LinkedResourceNotFoundException("Room ID does not exist."); // [cite: 129, 155]
+        // 422 - missing fields
+        if (sensor.getId() == null || sensor.getId().trim().isEmpty()) {
+            Map<String, String> err = new HashMap<>();
+            err.put("error", "Unprocessable Entity");
+            err.put("message", "Sensor ID is required.");
+            return Response.status(422).entity(err).build();
         }
+        // 404 - room must exist
+        if (!DataStore.rooms.containsKey(sensor.getRoomId())) {
+            throw new LinkedResourceNotFoundException(
+                    "Room not found: " + sensor.getRoomId(), "Room"
+            );
+        }
+        // 409 - duplicate sensor
+        if (DataStore.sensors.containsKey(sensor.getId())) {
+            Map<String, String> err = new HashMap<>();
+            err.put("error", "Conflict");
+            err.put("message", "Sensor " + sensor.getId() + " already exists.");
+            return Response.status(409).entity(err).build();
+        }
+
         DataStore.sensors.put(sensor.getId(), sensor);
+        // link sensor to room
         DataStore.rooms.get(sensor.getRoomId()).getSensorIds().add(sensor.getId());
+
         return Response.status(Response.Status.CREATED).entity(sensor).build();
     }
 
-    // Sub-resource locator [cite: 141]
+    @GET
+    @Path("/{sensorId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getSensorById(@PathParam("sensorId") String sensorId) {
+        Sensor sensor = DataStore.sensors.get(sensorId);
+        if (sensor == null) {
+            throw new LinkedResourceNotFoundException("Sensor not found: " + sensorId, "Sensor");
+        }
+        return Response.ok(sensor).build();
+    }
+
+    // Sub-resource locator for readings
     @Path("/{sensorId}/readings")
     public SensorReadingResource getReadings(@PathParam("sensorId") String sensorId) {
         return new SensorReadingResource(sensorId);

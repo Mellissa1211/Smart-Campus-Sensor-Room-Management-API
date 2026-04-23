@@ -4,6 +4,7 @@
  */
 package com.smartcampus.resources;
 
+import com.smartcampus.exceptions.LinkedResourceNotFoundException;
 import com.smartcampus.models.SensorReading;
 import com.smartcampus.models.Sensor;
 import com.smartcampus.store.DataStore;
@@ -26,20 +27,30 @@ public class SensorReadingResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)  // ← ADDED
     public Response addReading(SensorReading reading) {
         Sensor s = DataStore.sensors.get(sensorId);
-
         if (s == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            throw new LinkedResourceNotFoundException("Sensor not found: " + sensorId, "Sensor");
         }
-        if ("MAINTENANCE".equals(s.getStatus())) {
-            throw new SensorUnavailableException("Sensor is in maintenance."); // [cite: 160]
+        if ("MAINTENANCE".equals(s.getStatus()) || "OFFLINE".equals(s.getStatus())) {
+            throw new SensorUnavailableException("Sensor is unavailable.", sensorId, s.getStatus());
         }
-
-        // Side effect: Update current value [cite: 146]
+        if (reading.getId() == null) {
+            reading.setId(java.util.UUID.randomUUID().toString());
+        }
+        if (reading.getTimestamp() == 0) {
+            reading.setTimestamp(System.currentTimeMillis());
+        }
         s.setCurrentValue(reading.getValue());
-
         DataStore.readings.computeIfAbsent(sensorId, k -> new ArrayList<>()).add(reading);
         return Response.status(Response.Status.CREATED).entity(reading).build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)  // ← GET all readings for a sensor
+    public Response getReadings() {
+        List<SensorReading> list = DataStore.readings.getOrDefault(sensorId, new ArrayList<>());
+        return Response.ok(list).build();
     }
 }
