@@ -12,17 +12,18 @@ import java.util.*;
 public class DiscoveryResource {
 
     @Context
-    UriInfo uriInfo;  // ← automatically knows the full base URL
+    UriInfo uriInfo;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDiscovery() {
-        String base = uriInfo.getBaseUri().toString(); // e.g. http://localhost:8080/smart-campus-api/api/v1/
+
+        // gets just: /smart-campus-api/api/v1/
+        String base = uriInfo.getBaseUri().getPath();
 
         Map<String, Object> meta = new HashMap<>();
-        meta.put("version", "v1");
+        meta.put("version", "1.0");
         meta.put("description", "Smart Campus Sensor Management API");
-        meta.put("contact", "admin@smartcampus.ac.uk");
 
         Map<String, String> links = new HashMap<>();
         links.put("rooms", base + "rooms");
