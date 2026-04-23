@@ -1,4 +1,4 @@
-package com.westminster.smart.campus.api;
+package com.smartcampus.api;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
@@ -8,6 +8,6 @@ import javax.ws.rs.core.Application;
  * Establishing the base URI for the API at /api/v1
  */
 @ApplicationPath("/api/v1")
-public class JAXRSConfiguration extends Application {
+public class SmartCampusApplication extends Application {
     // Empty body — the annotation does everything
 }

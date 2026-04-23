@@ -2,11 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.westminster.smart.campus.api.resources;
+package com.smartcampus.resources;
 
-import com.westminster.smart.campus.api.DataStore;
-import com.westminster.smart.campus.api.models.Room;
-import com.westminster.smart.campus.api.exceptions.RoomNotEmptyException;
+import com.smartcampus.store.DataStore;
+import com.smartcampus.models.Room;
+import com.smartcampus.exceptions.RoomNotEmptyException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.*;

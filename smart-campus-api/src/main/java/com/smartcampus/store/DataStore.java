@@ -2,9 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.westminster.smart.campus.api;
+package com.smartcampus.store;
 
-import com.westminster.smart.campus.api.models.*;
+import com.smartcampus.models.SensorReading;
+import com.smartcampus.models.Room;
+import com.smartcampus.models.Sensor;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 

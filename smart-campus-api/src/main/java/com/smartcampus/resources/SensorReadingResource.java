@@ -2,11 +2,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.westminster.smart.campus.api.resources;
+package com.smartcampus.resources;
 
-import com.westminster.smart.campus.api.DataStore;
-import com.westminster.smart.campus.api.models.*;
-import com.westminster.smart.campus.api.exceptions.SensorUnavailableException;
+import com.smartcampus.models.SensorReading;
+import com.smartcampus.models.Sensor;
+import com.smartcampus.store.DataStore;
+import com.smartcampus.exceptions.SensorUnavailableException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.*;

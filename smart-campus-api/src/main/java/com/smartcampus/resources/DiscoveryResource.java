@@ -1,4 +1,4 @@
-package com.westminster.smart.campus.api.resources;
+package com.smartcampus.resources;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
