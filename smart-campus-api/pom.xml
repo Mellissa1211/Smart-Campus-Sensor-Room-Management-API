@@ -1,82 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" 
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
-    <!-- TASK 0.1: Project coordinates -->
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.westminster</groupId>
+    <groupId>com.smartcampus</groupId>
     <artifactId>smart-campus-api</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>smart-campus-api-1.0-SNAPSHOT</name>
+    <name>Smart Campus API</name>
 
     <properties>
-        <!-- TASK 0.2: Java version settings -->
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        
-        <!-- TASK 0.3: Web XML optional -->
         <failOnMissingWebXml>false</failOnMissingWebXml>
-
-        <!-- TASK 0.4: Jakarta EE version -->
-        <jakartaee>8.0</jakartaee>
+        <jersey.version>2.35</jersey.version>
     </properties>
 
     <dependencies>
-        <!-- TASK 1.1: Jersey servlet container -->
-        <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-servlet</artifactId>
-            <version>2.35</version>
-        </dependency>
-
-        <!-- TASK 1.2: Jersey JSON support with Jackson -->
-        <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-json-jackson</artifactId>
-            <version>2.35</version>
-        </dependency>
-
-        <!-- TASK 1.3: HK2 dependency injection support -->
-        <dependency>
-            <groupId>org.glassfish.jersey.inject</groupId>
-            <artifactId>jersey-hk2</artifactId>
-            <version>2.35</version>
-        </dependency>
-
-        <!-- TASK 1.4: Java EE API for compilation, provided by container at runtime -->
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
-            <version>${jakartaee}</version>
+            <version>8.0.1</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
         </dependency>
     </dependencies>
 
     <build>
+        <finalName>smart-campus-api</finalName>
         <plugins>
-            <!-- TASK 2.1: Compiler plugin updated to 3.11.0 for modern Java -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
                 <configuration>
-                    <!-- TASK 2.1.1: Ensures Java 8 source and target compatibility -->
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
             </plugin>
-
-            <!-- TASK 2.2: WAR plugin updated to 3.4.0 to avoid JDK 21 Security Conflicts -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.4.0</version>
                 <configuration>
-                    <!-- TASK 2.2.1: Allows WAR build without web.xml -->
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
             </plugin>
