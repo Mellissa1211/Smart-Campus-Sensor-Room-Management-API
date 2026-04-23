@@ -4,25 +4,18 @@
  */
 package com.smartcampus.store;
 
-import com.smartcampus.models.SensorReading;
-import com.smartcampus.models.Room;
-import com.smartcampus.models.Sensor;
+import com.smartcampus.models.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Part 1.1 - Data Management - Use data structures like HashMap/ArrayList (No SQL allowed)
+ * Part 1.1 - Data Management - Use data structures like HashMap/ArrayList (No
+ * SQL allowed)
  */
 public class DataStore {
-    private static DataStore instance = new DataStore();
-    
-    // Task 1.1: Architectural decision to use ConcurrentHashMap for race-condition prevention
-    public Map<String, Room> rooms = new ConcurrentHashMap<>();
-    
-    public Map<String, Sensor> sensors = new ConcurrentHashMap<>();
-    
-    public Map<String, List<SensorReading>> readings = new ConcurrentHashMap<>();
 
-    private DataStore() {}
-    public static DataStore getInstance() { return instance; }
+    public static Map<String, Room> rooms = new ConcurrentHashMap<>();
+    public static Map<String, Sensor> sensors = new ConcurrentHashMap<>();
+    // Key is SensorID, Value is List of Readings
+    public static Map<String, List<SensorReading>> readings = new ConcurrentHashMap<>();
 }

@@ -17,12 +17,12 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
     private static final Logger LOG = Logger.getLogger(LoggingFilter.class.getName());
 
     @Override
-    public void filter(ContainerRequestContext req) throws IOException {
-        LOG.info(">>> API REQUEST: " + req.getMethod() + " URL: " + req.getUriInfo().getRequestUri());
+    public void filter(ContainerRequestContext requestContext) throws IOException {
+        LOG.info("Method: " + requestContext.getMethod() + " URI: " + requestContext.getUriInfo().getRequestUri());
     }
 
     @Override
-    public void filter(ContainerRequestContext req, ContainerResponseContext res) throws IOException {
-        LOG.info("<<< API RESPONSE STATUS: " + res.getStatus());
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
+        LOG.info("Status Code: " + responseContext.getStatus());
     }
 }

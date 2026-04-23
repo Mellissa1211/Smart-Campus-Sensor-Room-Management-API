@@ -8,13 +8,11 @@ package com.smartcampus.models;
  * TASK 4.2: Sensor Reading Model for historical logs
  */
 public class SensorReading {
-    private String id;
-    private long timestamp;
-    private double value;
+    private String id; // UUID [cite: 88, 94]
+    private long timestamp; // Epoch time [cite: 90, 95]
+    private double value; 
 
     public SensorReading() {}
-    
-    //getters and setters
 
     public String getId() {
         return id;
@@ -39,5 +37,6 @@ public class SensorReading {
     public void setValue(double value) {
         this.value = value;
     }
+    
     
 }

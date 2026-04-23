@@ -8,5 +8,20 @@ package com.smartcampus.exceptions;
  * TASK 5.2: Custom Unprocessable Entity Exception (422)
  */
 public class LinkedResourceNotFoundException extends RuntimeException {
-    public LinkedResourceNotFoundException(String m) { super(m); }
+
+    private final String resourceType;
+
+    public LinkedResourceNotFoundException(String message) {
+        super(message);
+        this.resourceType = "Unknown";
+    }
+
+    public LinkedResourceNotFoundException(String message, String resourceType) {
+        super(message);
+        this.resourceType = resourceType;
+    }
+
+    public String getResourceType() {
+        return resourceType;
+    }
 }

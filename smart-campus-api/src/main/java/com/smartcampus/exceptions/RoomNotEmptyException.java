@@ -8,5 +8,20 @@ package com.smartcampus.exceptions;
  * TASK 5.1: Custom Conflict Exception (409)
  */
 public class RoomNotEmptyException extends RuntimeException {
-    public RoomNotEmptyException(String m) { super(m); }
+
+    private final String roomId;
+
+    public RoomNotEmptyException(String message) {
+        super(message);
+        this.roomId = null;
+    }
+
+    public RoomNotEmptyException(String message, String roomId) {
+        super(message);
+        this.roomId = roomId;
+    }
+
+    public String getRoomId() {
+        return roomId;
+    }
 }

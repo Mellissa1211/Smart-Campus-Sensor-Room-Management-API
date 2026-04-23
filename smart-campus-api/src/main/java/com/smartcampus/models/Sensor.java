@@ -8,15 +8,13 @@ package com.smartcampus.models;
  * TASK 3.1: Sensor Entity Model
  */
 public class Sensor {
-    private String id;
-    private String type;     // e.g., "Temperature", "CO2"
-    private String status;   // "ACTIVE", "MAINTENANCE"
-    private double currentValue;
-    private String roomId;   // Linking ID
+    private String id; 
+    private String type; // e.g., "Temperature", "CO2" [cite: 72, 73]
+    private String status; // "ACTIVE", "MAINTENANCE", "OFFLINE" [cite: 74, 75]
+    private double currentValue; 
+    private String roomId; 
 
     public Sensor() {}
-    
-    //getter and setters
 
     public String getId() {
         return id;
@@ -57,5 +55,6 @@ public class Sensor {
     public void setRoomId(String roomId) {
         this.roomId = roomId;
     }
+    
     
 }

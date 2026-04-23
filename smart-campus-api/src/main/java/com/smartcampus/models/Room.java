@@ -14,14 +14,11 @@ import java.util.List;
  * TASK 2.3 RULE: Room cannot be deleted if sensorIds is not empty.
  */
 public class Room {
-    private String id;
-    private String name;
-    private int capacity;
-    private List<String> sensorIds = new ArrayList<>();
-
+    private String id; // e.g., "LIB-301" 
+    private String name; // e.g., "Library Quiet Study" 
+    private int capacity; 
+    private List<String> sensorIds = new ArrayList<>(); 
     public Room() {}
-    
-    // Getters and Setters
 
     public String getId() {
         return id;
@@ -54,5 +51,6 @@ public class Room {
     public void setSensorIds(List<String> sensorIds) {
         this.sensorIds = sensorIds;
     }
+    
     
 }
