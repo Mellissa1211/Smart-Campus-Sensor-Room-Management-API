@@ -16,7 +16,7 @@ import java.util.*;
 public class RoomResource {
 
     /**
-     * TASK 2.1: Retrieve all rooms.
+     * TASK 2.1: Retrieve all rooms from the DataStore.
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -25,7 +25,7 @@ public class RoomResource {
     }
 
     /**
-     * TASK 2.1: Create a new room.
+     * TASK 2.1: Create a new room with manual validation.
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -39,7 +39,8 @@ public class RoomResource {
     }
 
     /**
-     * TASK 2.2 & 5.1: Safe deletion logic.
+     * TASK 2.2 & 5.1: Safe deletion logic. Throws RoomNotEmptyException if
+     * sensors are still assigned.
      */
     @DELETE
     @Path("/{roomId}")
@@ -49,6 +50,7 @@ public class RoomResource {
             throw new LinkedResourceNotFoundException("Room not found: " + roomId);
         }
 
+        // Integrity check
         if (room.getSensorIds() != null && !room.getSensorIds().isEmpty()) {
             throw new RoomNotEmptyException("Cannot delete room; sensors are still assigned.", roomId);
         }

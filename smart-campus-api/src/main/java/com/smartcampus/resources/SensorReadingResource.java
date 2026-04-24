@@ -22,7 +22,7 @@ public class SensorReadingResource {
     }
 
     /**
-     * TASK 4.2 & 5.3: Add reading with maintenance check.
+     * TASK 4.2 & 5.3: Add historical data with maintenance validation.
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -34,11 +34,12 @@ public class SensorReadingResource {
             throw new LinkedResourceNotFoundException("Sensor " + sensorId + " not found.");
         }
 
+        // TASK 5.3 Check
         if ("MAINTENANCE".equals(s.getStatus())) {
-            throw new SensorUnavailableException("Reading rejected: Sensor is undergoing maintenance.", sensorId);
+            throw new SensorUnavailableException("Reading rejected: Sensor is in maintenance mode.", sensorId);
         }
 
-        // TASK 4.2: SIDE EFFECT - Update parent sensor current value
+        // TASK 4.2 SIDE EFFECT: Automatically update parent sensor
         s.setCurrentValue(reading.getValue());
 
         DataStore.readings.computeIfAbsent(sensorId, k -> new ArrayList<>()).add(reading);
@@ -46,7 +47,7 @@ public class SensorReadingResource {
     }
 
     /**
-     * TASK 4.2: Retrieve history.
+     * TASK 4.2: Retrieve reading history for the sensor.
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)

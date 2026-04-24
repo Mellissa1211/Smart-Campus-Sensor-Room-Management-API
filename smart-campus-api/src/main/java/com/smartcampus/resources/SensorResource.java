@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class SensorResource {
 
     /**
-     * TASK 3.2: Filtered retrieval of sensors by type.
+     * TASK 3.2: Filtered retrieval of sensors by type using @QueryParam.
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -46,6 +46,7 @@ public class SensorResource {
 
         DataStore.sensors.put(sensor.getId(), sensor);
 
+        // Link the sensor to the room
         if (targetRoom.getSensorIds() == null) {
             targetRoom.setSensorIds(new ArrayList<String>());
         }
@@ -55,7 +56,7 @@ public class SensorResource {
     }
 
     /**
-     * TASK 4.1: Sub-resource locator.
+     * TASK 4.1: Sub-resource locator for sensor readings.
      */
     @Path("/{sensorId}/readings")
     public SensorReadingResource getReadings(@PathParam("sensorId") String sensorId) {
