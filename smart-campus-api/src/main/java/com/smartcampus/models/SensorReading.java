@@ -5,7 +5,7 @@
 package com.smartcampus.models;
 
 /**
- * TASK 4.2: Historical Data Model
+ * TASK 4.2: Model for historical sensor data entries.
  */
 public class SensorReading {
 
@@ -14,6 +14,7 @@ public class SensorReading {
     private long timestamp;
 
     public SensorReading() {
+        this.timestamp = System.currentTimeMillis();
     }
 
     public String getId() {

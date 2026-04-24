@@ -1,24 +1,25 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.smartcampus.resources;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.*;
 
-/**
- * TASK 1.2: Discovery Endpoint Providing API metadata and HATEOAS-style links
- * to navigate the API.
- */
 @Path("/")
 public class DiscoveryResource {
 
     @Context
-    UriInfo uriInfo;
+    private UriInfo uriInfo;
 
+    /**
+     * TASK 1.2: Discovery Endpoint providing API metadata and navigation links.
+     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDiscovery() {
-
-        // gets just: /smart-campus-api/api/v1/
         String base = uriInfo.getBaseUri().getPath();
 
         Map<String, Object> meta = new HashMap<>();

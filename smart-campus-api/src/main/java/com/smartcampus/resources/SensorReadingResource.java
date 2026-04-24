@@ -4,45 +4,53 @@
  */
 package com.smartcampus.resources;
 
-import com.smartcampus.exceptions.LinkedResourceNotFoundException;
-import com.smartcampus.exceptions.SensorUnavailableException;
+import com.smartcampus.store.DataStore;
 import com.smartcampus.models.Sensor;
 import com.smartcampus.models.SensorReading;
-import com.smartcampus.store.DataStore;
+import com.smartcampus.exceptions.LinkedResourceNotFoundException;
+import com.smartcampus.exceptions.SensorUnavailableException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.ArrayList;
 
 public class SensorReadingResource {
 
-    private String sensorId;
+    private final String sensorId;
 
     public SensorReadingResource(String sensorId) {
         this.sensorId = sensorId;
     }
 
     /**
-     * TASK 4.2 & 5.3: Add reading with maintenance check. Includes side-effect
-     * to update the parent sensor's current value.
+     * TASK 4.2 & 5.3: Add reading with maintenance check.
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addReading(SensorReading reading) {
         Sensor s = DataStore.sensors.get(sensorId);
+
         if (s == null) {
-            throw new LinkedResourceNotFoundException("Sensor not found.");
+            throw new LinkedResourceNotFoundException("Sensor " + sensorId + " not found.");
         }
 
-        // Logic for Task 5.3 (403 Forbidden Mapper)
         if ("MAINTENANCE".equals(s.getStatus())) {
-            throw new SensorUnavailableException("Sensor is currently in maintenance.", sensorId);
+            throw new SensorUnavailableException("Reading rejected: Sensor is undergoing maintenance.", sensorId);
         }
 
-        // Update parent sensor value (Task 4.2 Side Effect)
+        // TASK 4.2: SIDE EFFECT - Update parent sensor current value
         s.setCurrentValue(reading.getValue());
 
         DataStore.readings.computeIfAbsent(sensorId, k -> new ArrayList<>()).add(reading);
         return Response.status(Response.Status.CREATED).entity(reading).build();
+    }
+
+    /**
+     * TASK 4.2: Retrieve history.
+     */
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getHistory() {
+        return Response.ok(DataStore.readings.getOrDefault(sensorId, new ArrayList<>())).build();
     }
 }

@@ -5,16 +5,18 @@
 package com.smartcampus.models;
 
 /**
- * TASK 3.1: Sensor Entity Model
+ * Model representing a hardware sensor within a room.
  */
 public class Sensor {
-    private String id; 
-    private String type; // e.g., "Temperature", "CO2" [cite: 72, 73]
-    private String status; // "ACTIVE", "MAINTENANCE", "OFFLINE" [cite: 74, 75]
-    private double currentValue; 
-    private String roomId; 
 
-    public Sensor() {}
+    private String id;
+    private String type;
+    private String roomId;
+    private String status; // TASK 5.3: Used for state constraints (e.g., MAINTENANCE)
+    private double currentValue;
+
+    public Sensor() {
+    }
 
     public String getId() {
         return id;
@@ -32,6 +34,14 @@ public class Sensor {
         this.type = type;
     }
 
+    public String getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(String roomId) {
+        this.roomId = roomId;
+    }
+
     public String getStatus() {
         return status;
     }
@@ -47,14 +57,4 @@ public class Sensor {
     public void setCurrentValue(double currentValue) {
         this.currentValue = currentValue;
     }
-
-    public String getRoomId() {
-        return roomId;
-    }
-
-    public void setRoomId(String roomId) {
-        this.roomId = roomId;
-    }
-    
-    
 }

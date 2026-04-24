@@ -8,17 +8,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TASK 2.1 - Room Model
- * Represents a physical campus room (lab, library, lecture hall etc.)
- * sensorIds list links this room to its installed sensors.
- * TASK 2.3 RULE: Room cannot be deleted if sensorIds is not empty.
+ * Model representing a physical room on campus.
  */
 public class Room {
-    private String id; // e.g., "LIB-301" 
-    private String name; // e.g., "Library Quiet Study" 
-    private int capacity; 
-    private List<String> sensorIds = new ArrayList<>(); 
-    public Room() {}
+
+    private String id;
+    private String name;
+    // TASK 2.2: Maintain a list of IDs for linked sensors to ensure integrity
+    private List<String> sensorIds = new ArrayList<>();
+
+    public Room() {
+    }
 
     public String getId() {
         return id;
@@ -36,14 +36,6 @@ public class Room {
         this.name = name;
     }
 
-    public int getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(int capacity) {
-        this.capacity = capacity;
-    }
-
     public List<String> getSensorIds() {
         return sensorIds;
     }
@@ -51,6 +43,4 @@ public class Room {
     public void setSensorIds(List<String> sensorIds) {
         this.sensorIds = sensorIds;
     }
-    
-    
 }

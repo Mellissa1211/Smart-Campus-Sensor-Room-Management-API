@@ -16,7 +16,7 @@ import java.util.*;
 public class RoomResource {
 
     /**
-     * TASK 2.1: Retrieve all rooms from the in-memory DataStore.
+     * TASK 2.1: Retrieve all rooms.
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -25,7 +25,7 @@ public class RoomResource {
     }
 
     /**
-     * TASK 2.1: Create a new room with manual validation.
+     * TASK 2.1: Create a new room.
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -39,19 +39,17 @@ public class RoomResource {
     }
 
     /**
-     * TASK 2.2 & 5.1: Safe deletion logic. Throws RoomNotEmptyException to
-     * trigger the 409 Conflict Mapper.
+     * TASK 2.2 & 5.1: Safe deletion logic.
      */
     @DELETE
     @Path("/{roomId}")
     public Response deleteRoom(@PathParam("roomId") String roomId) {
         Room room = DataStore.rooms.get(roomId);
         if (room == null) {
-            // TASK 5.2: Reusing 422 logic if resource is missing during action
             throw new LinkedResourceNotFoundException("Room not found: " + roomId);
         }
 
-        if (!room.getSensorIds().isEmpty()) {
+        if (room.getSensorIds() != null && !room.getSensorIds().isEmpty()) {
             throw new RoomNotEmptyException("Cannot delete room; sensors are still assigned.", roomId);
         }
 

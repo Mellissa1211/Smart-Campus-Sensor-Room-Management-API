@@ -6,6 +6,7 @@ package com.smartcampus.resources;
 
 import com.smartcampus.store.DataStore;
 import com.smartcampus.models.Sensor;
+import com.smartcampus.models.Room;
 import com.smartcampus.exceptions.LinkedResourceNotFoundException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -16,14 +17,14 @@ import java.util.stream.Collectors;
 public class SensorResource {
 
     /**
-     * TASK 3.2: Filtered search by sensor type.
+     * TASK 3.2: Filtered retrieval of sensors by type.
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSensors(@QueryParam("type") String type) {
-        if (type != null) {
+        if (type != null && !type.isEmpty()) {
             List<Sensor> filtered = DataStore.sensors.values().stream()
-                    .filter(s -> s.getType().equalsIgnoreCase(type))
+                    .filter(s -> s.getType() != null && s.getType().equalsIgnoreCase(type))
                     .collect(Collectors.toList());
             return Response.ok(filtered).build();
         }
@@ -31,24 +32,30 @@ public class SensorResource {
     }
 
     /**
-     * TASK 3.1 & 5.2: Integrity check for Room existence. Throws
-     * LinkedResourceNotFoundException for the 422 Mapper.
+     * TASK 3.1 & 5.2: Registration with Room Integrity Check.
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addSensor(Sensor sensor) {
-        if (!DataStore.rooms.containsKey(sensor.getRoomId())) {
-            throw new LinkedResourceNotFoundException("Target Room ID does not exist.");
+        Room targetRoom = DataStore.rooms.get(sensor.getRoomId());
+
+        if (targetRoom == null) {
+            throw new LinkedResourceNotFoundException("Validation Failed: Room " + sensor.getRoomId() + " does not exist.");
         }
 
         DataStore.sensors.put(sensor.getId(), sensor);
-        DataStore.rooms.get(sensor.getRoomId()).getSensorIds().add(sensor.getId());
+
+        if (targetRoom.getSensorIds() == null) {
+            targetRoom.setSensorIds(new ArrayList<String>());
+        }
+        targetRoom.getSensorIds().add(sensor.getId());
+
         return Response.status(Response.Status.CREATED).entity(sensor).build();
     }
 
     /**
-     * TASK 4.1: Sub-resource locator for historical data.
+     * TASK 4.1: Sub-resource locator.
      */
     @Path("/{sensorId}/readings")
     public SensorReadingResource getReadings(@PathParam("sensorId") String sensorId) {
