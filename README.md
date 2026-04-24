@@ -1,8 +1,9 @@
 # Smart Campus Sensor & Room Management API
 
 **Module:** 5COSC022W — Client-Server Architectures
-**Student:** [YOUR NAME]
-**Student ID:** [YOUR STUDENT ID]
+
+**Student:** Mellissa.R.G.Mangalaari
+**Student ID:** 20232750 / w2153574
 
 A RESTful API built with **JAX-RS (Jersey)** for managing campus rooms and IoT sensors. Uses in-memory data storage only — no database required.
 
