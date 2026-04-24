@@ -9,7 +9,13 @@ package com.smartcampus.exceptions;
  */
 public class LinkedResourceNotFoundException extends RuntimeException {
 
+    // Single-arg constructor (used by SensorResource, SensorReadingResource)
     public LinkedResourceNotFoundException(String message) {
         super(message);
+    }
+
+    // Two-arg constructor (used by RoomResource — passes resourceType as second arg)
+    public LinkedResourceNotFoundException(String message, String resourceType) {
+        super(message + " [Resource type: " + resourceType + "]");
     }
 }

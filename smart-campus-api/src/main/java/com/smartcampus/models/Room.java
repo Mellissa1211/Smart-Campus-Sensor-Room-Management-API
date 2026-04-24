@@ -14,7 +14,7 @@ public class Room {
 
     private String id;
     private String name;
-    // TASK 2.2: Maintain a list of IDs for linked sensors to ensure integrity
+    private int capacity; // SPEC REQUIREMENT: Maximum occupancy for safety regulations
     private List<String> sensorIds = new ArrayList<>();
 
     public Room() {
@@ -34,6 +34,14 @@ public class Room {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
     }
 
     public List<String> getSensorIds() {

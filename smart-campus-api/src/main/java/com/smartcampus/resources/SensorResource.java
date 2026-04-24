@@ -32,31 +32,115 @@ public class SensorResource {
     }
 
     /**
-     * TASK 3.1 & 5.2: Registration with Room Integrity Check.
+     * TASK 3.1: Retrieve a single sensor by ID.
+     */
+    @GET
+    @Path("/{sensorId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getSensorById(@PathParam("sensorId") String sensorId) {
+        Sensor s = DataStore.sensors.get(sensorId);
+        if (s == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(Map.of("status", 404, "error", "Not Found",
+                            "message", "Sensor not found: " + sensorId))
+                    .build();
+        }
+        return Response.ok(s).build();
+    }
+
+    /**
+     * TASK 3.1 & 5.2: Registration with Room Integrity Check. Ensures the
+     * roomId in the JSON actually exists in the DataStore.
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addSensor(Sensor sensor) {
-        Room targetRoom = DataStore.rooms.get(sensor.getRoomId());
-
-        if (targetRoom == null) {
-            throw new LinkedResourceNotFoundException("Validation Failed: Room " + sensor.getRoomId() + " does not exist.");
+        // Basic validation
+        if (sensor.getId() == null || sensor.getId().trim().isEmpty()) {
+            return Response.status(422)
+                    .entity(Map.of("status", 422, "error", "Unprocessable Entity",
+                            "message", "Sensor ID is required."))
+                    .build();
         }
 
+        // Conflict check
+        if (DataStore.sensors.containsKey(sensor.getId())) {
+            return Response.status(Response.Status.CONFLICT)
+                    .entity(Map.of("status", 409, "error", "Conflict",
+                            "message", "Sensor " + sensor.getId() + " already exists."))
+                    .build();
+        }
+
+        // TASK 5.2: Dependency Validation — roomId must exist
+        Room targetRoom = DataStore.rooms.get(sensor.getRoomId());
+        if (targetRoom == null) {
+            throw new LinkedResourceNotFoundException(
+                    "Validation Failed: Room '" + sensor.getRoomId() + "' does not exist.");
+        }
+
+        // Add to global store
         DataStore.sensors.put(sensor.getId(), sensor);
 
-        // Link the sensor to the room
+        // Maintain the bi-directional link (required for Task 5.1 room deletion guard)
         if (targetRoom.getSensorIds() == null) {
-            targetRoom.setSensorIds(new ArrayList<String>());
+            targetRoom.setSensorIds(new ArrayList<>());
         }
-        targetRoom.getSensorIds().add(sensor.getId());
+        if (!targetRoom.getSensorIds().contains(sensor.getId())) {
+            targetRoom.getSensorIds().add(sensor.getId());
+        }
 
         return Response.status(Response.Status.CREATED).entity(sensor).build();
     }
 
     /**
-     * TASK 4.1: Sub-resource locator for sensor readings.
+     * Update a sensor's details using PUT.
+     */
+    @PUT
+    @Path("/{sensorId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateSensor(@PathParam("sensorId") String sensorId, Sensor updatedSensor) {
+        Sensor existing = DataStore.sensors.get(sensorId);
+        if (existing == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(Map.of("status", 404, "error", "Not Found",
+                            "message", "Sensor not found: " + sensorId))
+                    .build();
+        }
+        updatedSensor.setId(sensorId);
+        DataStore.sensors.put(sensorId, updatedSensor);
+        return Response.ok(updatedSensor).build();
+    }
+
+    /**
+     * Delete a sensor and remove it from its parent room's list.
+     */
+    @DELETE
+    @Path("/{sensorId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteSensor(@PathParam("sensorId") String sensorId) {
+        Sensor sensor = DataStore.sensors.get(sensorId);
+        if (sensor == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(Map.of("status", 404, "error", "Not Found",
+                            "message", "Sensor not found: " + sensorId))
+                    .build();
+        }
+
+        // Remove from parent room's sensorIds list to maintain integrity
+        Room parentRoom = DataStore.rooms.get(sensor.getRoomId());
+        if (parentRoom != null && parentRoom.getSensorIds() != null) {
+            parentRoom.getSensorIds().remove(sensorId);
+        }
+
+        DataStore.sensors.remove(sensorId);
+        return Response.noContent().build();
+    }
+
+    /**
+     * TASK 4.1: Sub-resource locator for sensor readings. Delegates handling to
+     * SensorReadingResource.
      */
     @Path("/{sensorId}/readings")
     public SensorReadingResource getReadings(@PathParam("sensorId") String sensorId) {

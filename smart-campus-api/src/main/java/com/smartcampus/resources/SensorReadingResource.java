@@ -12,6 +12,8 @@ import com.smartcampus.exceptions.SensorUnavailableException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.UUID;
 
 public class SensorReadingResource {
 
@@ -22,7 +24,7 @@ public class SensorReadingResource {
     }
 
     /**
-     * TASK 4.2 & 5.3: Add historical data with maintenance validation.
+     * TASK 4.2 & 5.3: Add a new reading with maintenance state validation.
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -30,16 +32,28 @@ public class SensorReadingResource {
     public Response addReading(SensorReading reading) {
         Sensor s = DataStore.sensors.get(sensorId);
 
+        // Sensor must exist
         if (s == null) {
-            throw new LinkedResourceNotFoundException("Sensor " + sensorId + " not found.");
+            throw new LinkedResourceNotFoundException("Sensor '" + sensorId + "' not found.");
         }
 
-        // TASK 5.3 Check
-        if ("MAINTENANCE".equals(s.getStatus())) {
-            throw new SensorUnavailableException("Reading rejected: Sensor is in maintenance mode.", sensorId);
+        // TASK 5.3: Block readings when sensor is in MAINTENANCE state
+        if ("MAINTENANCE".equalsIgnoreCase(s.getStatus())) {
+            throw new SensorUnavailableException(
+                    "Reading rejected: Sensor '" + sensorId + "' is currently in MAINTENANCE mode.", sensorId);
         }
 
-        // TASK 4.2 SIDE EFFECT: Automatically update parent sensor
+        // Auto-assign a unique ID if not provided
+        if (reading.getId() == null || reading.getId().trim().isEmpty()) {
+            reading.setId(UUID.randomUUID().toString());
+        }
+
+        // Set timestamp if not provided
+        if (reading.getTimestamp() == 0) {
+            reading.setTimestamp(System.currentTimeMillis());
+        }
+
+        // TASK 4.2 SIDE EFFECT: Update parent sensor's currentValue for data consistency
         s.setCurrentValue(reading.getValue());
 
         DataStore.readings.computeIfAbsent(sensorId, k -> new ArrayList<>()).add(reading);
@@ -47,11 +61,15 @@ public class SensorReadingResource {
     }
 
     /**
-     * TASK 4.2: Retrieve reading history for the sensor.
+     * TASK 4.2: Retrieve reading history for this sensor.
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getHistory() {
+        // Verify the sensor actually exists before returning history
+        if (!DataStore.sensors.containsKey(sensorId)) {
+            throw new LinkedResourceNotFoundException("Sensor '" + sensorId + "' not found.");
+        }
         return Response.ok(DataStore.readings.getOrDefault(sensorId, new ArrayList<>())).build();
     }
 }
