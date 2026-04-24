@@ -5,30 +5,18 @@
 package com.smartcampus.exceptions;
 
 /**
- * TASK 5.3: Custom Forbidden Exception (403)
+ * TASK 5.3: State Constraint Scenario (Maintenance Mode)
  */
 public class SensorUnavailableException extends RuntimeException {
 
     private final String sensorId;
-    private final String sensorStatus;
 
-    public SensorUnavailableException(String message) {
-        super(message);
-        this.sensorId = null;
-        this.sensorStatus = null;
-    }
-
-    public SensorUnavailableException(String message, String sensorId, String sensorStatus) {
+    public SensorUnavailableException(String message, String sensorId) {
         super(message);
         this.sensorId = sensorId;
-        this.sensorStatus = sensorStatus;
     }
 
     public String getSensorId() {
         return sensorId;
-    }
-
-    public String getSensorStatus() {
-        return sensorStatus;
     }
 }
